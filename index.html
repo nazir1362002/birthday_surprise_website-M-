@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🎂 A Birthday Surprise</title>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<!--
+=====================  README  =====================
+HOW TO CUSTOMISE (everything is in this one file):
+1. NAME / TEXT  -> edit the CONFIG object at the top of the <script>.
+2. PHOTOS       -> put your images in the SAME FOLDER as index.html, named exactly:
+     photo1.jpg  HERO portrait ............ 4:5 portrait, 800x1000
+     photo2.jpg  GIFT BOX reveal .......... 1:1 square, 800x800
+     photo3.jpg  MEMORY TIMELINE .......... 4:3 landscape, 1000x750
+     photo4.jpg  polaroid 1 ............... 1:1 square, 700x700
+     photo5.jpg  polaroid 2 ............... 1:1 square, 700x700
+     photo6.jpg  polaroid 3 ............... 1:1 square, 700x700
+     photo7.jpg  polaroid 4 ............... 1:1 square, 700x700
+     photo8.jpg  FINAL REVEAL ............. 4:5 portrait, 800x1000
+   (Missing photos show a dashed "Add photo here" box, so nothing looks broken.)
+3. COLORS       -> change the CSS variables in :root below.
+4. MUSIC        -> drop music.mp3 next to index.html (no autoplay; she taps 🔊).
+5. MESSAGES     -> messages, compliments, captions, etc. are all in CONFIG.
+====================================================
+-->
+<style>
+/* ============ COLORS (edit here) ============ */
+:root{
+  --pink:#ff6fa8; --purple:#8a5cf6; --coral:#ff7a6b; --gold:#ffc83d;
+  --ink:#3a1650; --glass:rgba(255,255,255,.22); --glass-b:rgba(255,255,255,.5);
+  --display:'Bagel Fat One',cursive; --body:'Nunito',system-ui,sans-serif; --hand:'Caveat',cursive;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);font-weight:600;color:#fff;min-height:100vh;overflow-x:hidden;
+  background:linear-gradient(130deg,var(--pink),var(--purple),var(--coral),var(--pink));background-size:300% 300%;
+  animation:bg 14s ease infinite;-webkit-tap-highlight-color:transparent}
+body.locked{overflow:hidden}
+@keyframes bg{50%{background-position:100% 50%}}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.05;text-shadow:0 3px 0 rgba(58,22,80,.25)}
+h2{font-size:clamp(1.9rem,7vw,3.2rem);margin-bottom:.6rem}
+p{font-size:1.1rem}
+button{font:800 1.05rem var(--body);border:0;border-radius:99px;padding:.85rem 1.6rem;cursor:pointer;color:var(--ink);
+  background:linear-gradient(180deg,#fff,#ffe6f1);box-shadow:0 6px 0 rgba(58,22,80,.28),0 12px 24px rgba(58,22,80,.25);
+  transition:transform .25s cubic-bezier(.34,1.8,.5,1)}
+button:hover{transform:translateY(-3px) scale(1.07)} button:active{transform:translateY(3px) scale(.95);box-shadow:0 2px 0 rgba(58,22,80,.28)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+button.gold{background:linear-gradient(180deg,#ffe27a,var(--gold))}
+.blobs i{position:fixed;z-index:0;border-radius:50%;filter:blur(60px);opacity:.55;animation:blob 16s ease-in-out infinite alternate;pointer-events:none}
+.blobs i:nth-child(1){width:46vmax;height:46vmax;background:var(--gold);left:-15vmax;top:-10vmax}
+.blobs i:nth-child(2){width:40vmax;height:40vmax;background:var(--purple);right:-12vmax;top:35vh;animation-delay:-5s}
+.blobs i:nth-child(3){width:38vmax;height:38vmax;background:var(--coral);left:10vw;bottom:-18vmax;animation-delay:-9s}
+@keyframes blob{to{transform:translate(8vw,-6vh) scale(1.2)}}
+#float{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+#float span{position:absolute;bottom:-60px;animation:rise linear infinite;opacity:.8}
+@keyframes rise{to{transform:translateY(-115vh) rotate(25deg)}}
+#fx{position:fixed;inset:0;z-index:50;pointer-events:none}
+#bar{position:fixed;top:0;left:0;height:5px;width:0;background:linear-gradient(90deg,var(--gold),#fff);z-index:60;border-radius:0 5px 5px 0}
+.tools{position:fixed;right:12px;top:12px;z-index:60;display:flex;gap:8px}
+.tools button{padding:.6rem .9rem}
+.heart{position:fixed;z-index:55;pointer-events:none;font-size:1.6rem;animation:hp 1.2s ease-out forwards}
+@keyframes hp{to{transform:translate(var(--dx),-120px) scale(1.5) rotate(var(--r));opacity:0}}
+main{position:relative;z-index:2}
+main.hide{display:none}
+section{min-height:100vh;padding:4.5rem 1.2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1rem}
+.glass{background:var(--glass);border:2px solid var(--glass-b);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-radius:32px;padding:1.6rem;box-shadow:0 20px 50px rgba(58,22,80,.3);max-width:520px;width:100%}
+.row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;min-height:64px;align-items:center}
+.pop{animation:pop .7s cubic-bezier(.34,1.8,.5,1) both}
+@keyframes pop{from{transform:scale(.2) rotate(-12deg);opacity:0}}
+/* photos */
+.frame{border-radius:24px;overflow:hidden;border:6px solid #fff;box-shadow:0 14px 30px rgba(58,22,80,.35);background:#fff}
+.frame img{display:block;width:100%;height:100%;object-fit:cover}
+.ph{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:120px;padding:1rem;
+  border:3px dashed var(--pink);border-radius:18px;background:#fff0f7;color:var(--ink);font-weight:800;text-align:center}
+.hero-ph{width:min(70vw,300px);aspect-ratio:4/5;transform:rotate(-3deg)}
+/* gate */
+#gate{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;padding:1.5rem;text-align:center;
+  background:linear-gradient(130deg,var(--purple),var(--pink));transition:opacity .6s}
+#gate h1{font-size:clamp(1.7rem,6.5vw,3rem);max-width:640px}
+/* gift */
+.gift{position:relative;width:170px;height:170px;cursor:pointer;animation:wig 1.6s ease-in-out infinite;border:0;background:none;box-shadow:none;padding:0;font-size:0}
+.gift:hover{transform:none}
+.gift .b{position:absolute;bottom:0;left:10px;right:10px;height:110px;background:var(--coral);border-radius:0 0 18px 18px}
+.gift .b:after,.gift .l:after{content:"";position:absolute;left:50%;width:26px;margin-left:-13px;top:0;bottom:0;background:var(--gold)}
+.gift .l{position:absolute;top:30px;left:0;right:0;height:44px;background:var(--pink);border-radius:14px;transition:transform .9s cubic-bezier(.2,.8,.3,1),opacity .9s;z-index:2}
+.gift .l:before{content:"🎀";position:absolute;top:-34px;left:50%;margin-left:-22px;font-size:44px;z-index:3}
+.gift.open{animation:none;cursor:default}
+.gift.open .l{transform:translate(90px,-260px) rotate(60deg);opacity:0}
+@keyframes wig{0%,100%{transform:rotate(0)}15%{transform:rotate(-8deg) scale(1.04)}30%{transform:rotate(8deg)}45%{transform:rotate(-5deg)}60%{transform:rotate(0)}}
+/* candles */
+.cake{position:relative;width:240px;margin:1.4rem auto 0;padding-top:70px}
+.cake .t{height:60px;background:#fff;border-radius:20px 20px 6px 6px;box-shadow:inset 0 -14px 0 var(--pink)}
+.cake .m{height:70px;background:var(--coral);border-radius:6px 6px 22px 22px;box-shadow:inset 0 14px 0 var(--gold)}
+.candles{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-around;padding:0 18px}
+.candle{width:16px;height:48px;background:repeating-linear-gradient(#fff 0 8px,var(--gold) 8px 16px);border-radius:4px;position:relative;margin-top:22px;border:0;padding:0;box-shadow:none}
+.flame{position:absolute;left:50%;top:-34px;margin-left:-11px;font-size:26px;line-height:1;cursor:pointer;transform-origin:50% 100%;animation:fl .35s ease-in-out infinite alternate;transition:opacity .4s,transform .4s;background:none;border:0;padding:0;box-shadow:none}
+.flame.out{opacity:0;transform:scale(.1);pointer-events:none}
+@keyframes fl{to{transform:scale(1.15,.9) rotate(5deg)}}
+/* balloons */
+.balloons{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;max-width:560px}
+.bal{font-size:4.2rem;line-height:1;background:none;box-shadow:none;padding:.2rem;animation:bob 3s ease-in-out infinite}
+.bal:nth-child(even){animation-delay:-1.4s}
+.bal:hover{transform:scale(1.2)}
+@keyframes bob{50%{transform:translateY(-14px) rotate(4deg)}}
+/* polaroids */
+.wall{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;max-width:560px;width:100%}
+.pol{background:#fff;color:var(--ink);padding:.6rem .6rem .4rem;border-radius:6px;box-shadow:0 12px 26px rgba(58,22,80,.35);transition:transform .35s cubic-bezier(.34,1.8,.5,1)}
+.pol:nth-child(1){transform:rotate(-5deg)}.pol:nth-child(2){transform:rotate(4deg)}.pol:nth-child(3){transform:rotate(3deg)}.pol:nth-child(4){transform:rotate(-4deg)}
+.pol:hover{transform:rotate(0) translateY(-10px) scale(1.07);z-index:3}
+.pol .sq{aspect-ratio:1;overflow:hidden;background:#eee}.pol img{width:100%;height:100%;object-fit:cover;display:block}
+.pol .ph{border-radius:0;font-size:.9rem}
+.pol small{display:block;font:700 1.3rem var(--hand);padding:.35rem 0}
+.tl{display:flex;gap:1rem;align-items:center;text-align:left}.tl .frame{width:42%;flex:none;aspect-ratio:4/3}
+/* scratch */
+.scratch{position:relative;width:min(88vw,360px);height:190px;border-radius:24px;overflow:hidden;box-shadow:0 14px 30px rgba(58,22,80,.35);background:#fff}
+.scratch .secret{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.2rem;color:var(--ink);font:700 1.7rem/1.2 var(--hand)}
+.scratch canvas{position:absolute;inset:0;touch-action:none;cursor:crosshair;transition:opacity .8s}
+/* finale */
+#finale h1{font-size:clamp(2.6rem,13vw,6.5rem);text-shadow:0 5px 0 rgba(58,22,80,.3),0 0 40px var(--gold)}
+#note{font:700 1.7rem/1.3 var(--hand);max-width:520px;min-height:6rem;white-space:pre-wrap}
+#note:after{content:"▍";animation:blink 1s steps(1) infinite}@keyframes blink{50%{opacity:0}}
+.fin-ph{width:min(60vw,260px);aspect-ratio:4/5;transform:rotate(3deg)}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body class="locked">
+<div class="blobs"><i></i><i></i><i></i></div>
+<div id="float"></div><canvas id="fx"></canvas><div id="bar"></div>
+
+<!-- 1. ENTRY GATE -->
+<div id="gate">
+  <h1>💖 A little surprise was made just for you. Ready to see it?</h1>
+  <div class="row"><button class="gold" id="yes">Yes! 🎉</button><button id="no">No</button></div>
+</div>
+
+<main class="hide" id="main">
+  <section id="hero">
+    <div class="frame hero-ph pop"><img data-p="0" alt="Portrait of the birthday girl"></div>
+    <h2 id="heroTitle"></h2><p>Scroll down — it's a whole adventure ↓</p>
+  </section>
+
+  <!-- 2. GIFT BOX -->
+  <section>
+    <h2>A present for you 🎁</h2><p id="giftHint">Tap the box!</p>
+    <button class="gift" id="gift" aria-label="Open the gift"><span class="l"></span><span class="b"></span>🎁</button>
+    <div class="glass pop" id="giftReveal" hidden>
+      <p id="giftMsg" style="margin-bottom:1rem"></p>
+      <div class="frame" style="aspect-ratio:1"><img data-p="1" alt="Gift photo"></div>
+    </div>
+  </section>
+
+  <!-- 3. WHAT DO YOU THINK OF ME -->
+  <section>
+    <h2>So… what do you think of me? 🥺</h2>
+    <div class="row" id="opinion"><button class="gold" id="amazing">You're literally amazing 😌</button><button id="dodgy">Meh</button></div>
+    <div class="glass" id="react" style="min-height:90px;display:flex;align-items:center;justify-content:center">Choose wisely…</div>
+  </section>
+
+  <!-- 4. CANDLES -->
+  <section>
+    <h2>Make a wish 🕯️</h2><p>Tap each flame — or hold the button to blow!</p>
+    <div class="cake"><div class="candles" id="candles"></div><div class="t"></div><div class="m"></div></div>
+    <button id="blow">💨 Hold to blow</button>
+    <h2 id="wish" hidden class="pop">Wish granted ✨</h2>
+  </section>
+
+  <!-- 5. BALLOONS -->
+  <section>
+    <h2>Pop the balloons 🎈</h2>
+    <div class="balloons" id="balloons"></div>
+    <div class="glass" id="balMsg" style="min-height:90px;display:flex;align-items:center;justify-content:center">Pop one!</div>
+  </section>
+
+  <!-- 6. POLAROIDS + TIMELINE -->
+  <section>
+    <h2>Our little memory wall 📸</h2>
+    <div class="glass tl"><div class="frame"><img data-p="2" alt="Memory timeline photo"></div><div><h3 id="tlTitle" style="font-size:1.4rem"></h3><p id="tlText"></p></div></div>
+    <div class="wall" id="wall"></div>
+  </section>
+
+  <!-- 7. SCRATCH -->
+  <section>
+    <h2>One last secret 🤫</h2><p>Scratch the card!</p>
+    <div class="scratch" id="scr"><div class="secret" id="secret"></div><canvas id="cv"></canvas></div>
+  </section>
+
+  <!-- 8. FINALE -->
+  <section id="finale">
+    <h1 id="fin"></h1>
+    <div class="frame fin-ph"><img data-p="7" alt="Final reveal photo"></div>
+    <p id="note"></p>
+  </section>
+</main>
+
+<div class="tools"><button id="conf" aria-label="More confetti">🎉 More confetti</button><button id="mute" aria-label="Toggle music">🔇</button></div>
+
+<script>
+/* =====================================================
+   CONFIG — EDIT EVERYTHING HERE. Nothing else to touch.
+   ===================================================== */
+const CONFIG = {
+  friendName: "Sadia Afrin Mishu",
+  age: 16,                       // e.g. 25, or null to hide
+  music: "music.mp3",              // optional file, next to index.html
+  photos: ["photo1.jpg","photo2.webp","photo3.jpg","photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg","photo8.jpg"],
+  captions: ["Remember this?","Best day ever","Pure chaos","My favourite"],   // under the 4 polaroids
+  timeline: { title: "The day we became friends", text: "The Best LFE Group" },
+  giftMessage: "Surprise! You deserve the whole universe today.",
+  messages: ["Hmm, you can do better than that 😏","Tap the other one 👀","It's right there, I promise!","You're breaking my heart 💔","Okay okay, I'll take the compliment!"],
+  dodgeTexts: ["Neh","Too slow!","Nope 😜","Try again","Can't catch me","Just click the other one","Pleeease 🥺"],
+  amazingReaction: "I KNEW IT! 🥹!",
+  compliments: ["You are someone people are lucky to have 💫","You make even the smallest moments memorable 🌸","Your laugh deserves its own soundtrack 🎶😂","You are stronger than the moments that try to break you 💪","Never forget how much you’re capable of ✨","Keep becoming the person you are meant to be 🌙 "],
+  scratchMessage: "Some friendships aren't planned. They just happen. 💌",
+  finalNote: "Dear friend,\nHappy birthday! Thank you for being you.\nFrom our first meeting in the LFE orientation to all the random conversations, laughs, and little memories we've made, I'm really grateful that life gave me a friend like you.I hope this new year of your life brings you lots of happiness, success, peace, and countless reasons to smile. You deserve all the good things coming your way.Keep smiling, keep being the amazing person you are, and have the happiest birthday! 🥳✨",};
+
+/* ================== HELPERS ================== */
+const $=s=>document.querySelector(s), rnd=(a,b)=>Math.random()*(b-a)+a;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const name=CONFIG.friendName;
+
+/* ================== PHOTOS ================== */
+function ph(img){const d=document.createElement('div');d.className='ph';d.textContent='📸 Add '+img.dataset.f+' here';img.replaceWith(d)}
+document.querySelectorAll('img[data-p]').forEach(i=>{i.dataset.f=CONFIG.photos[i.dataset.p];i.onerror=()=>ph(i);i.src=i.dataset.f});
+$('#wall').innerHTML=[3,4,5,6].map((n,i)=>`<div class="pol"><div class="sq"><img data-p="${n}" alt="Polaroid ${i+1}"></div><small>${CONFIG.captions[i]||''}</small></div>`).join('');
+$('#wall').querySelectorAll('img').forEach(i=>{i.dataset.f=CONFIG.photos[i.dataset.p];i.onerror=()=>ph(i);i.src=i.dataset.f});
+
+/* ================== TEXT FROM CONFIG ================== */
+$('#heroTitle').textContent=`Hey ${name}! 💖`;
+$('#giftMsg').textContent=CONFIG.giftMessage;
+$('#tlTitle').textContent=CONFIG.timeline.title;$('#tlText').textContent=CONFIG.timeline.text;
+$('#secret').textContent=CONFIG.scratchMessage;
+$('#fin').innerHTML=`Happy Birthday<br>${name}${CONFIG.age?' 🎂Sweet '+CONFIG.age:' 🎂'}`;
+
+/* ================== CONFETTI / FIREWORKS ================== */
+const cv=$('#fx'),cx=cv.getContext('2d');let ps=[];
+function size(){cv.width=innerWidth;cv.height=innerHeight}size();addEventListener('resize',size);
+const cols=()=>['#ff6fa8','#8a5cf6','#ff7a6b','#ffc83d','#fff'].map(c=>c);
+function burst(x,y,n=90,spread=1){if(reduce)n=Math.min(n,15);const c=cols();
+  for(let i=0;i<n;i++){const a=rnd(0,6.28),v=rnd(3,11)*spread;ps.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-4,s:rnd(5,10),c:c[i%5],r:rnd(0,6),l:1})}
+  if(ps.length===n)loop()}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);
+  ps=ps.filter(p=>p.l>0);
+  ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.22;p.vx*=.99;p.r+=.2;p.l-=.011;cx.globalAlpha=Math.max(p.l,0);cx.fillStyle=p.c;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore()});
+  if(ps.length)requestAnimationFrame(loop);else cx.clearRect(0,0,cv.width,cv.height)}
+const center=el=>{const r=el.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]};
+$('#conf').onclick=()=>{burst(innerWidth/2,innerHeight/3,140);burst(innerWidth*.2,innerHeight/2,70);burst(innerWidth*.8,innerHeight/2,70)};
+
+/* ================== HEARTS ON CLICK + SCROLL BAR ================== */
+addEventListener('pointerdown',e=>{if(reduce)return;const h=document.createElement('span');h.className='heart';
+  h.textContent=['💖','💗','💕','✨','💜'][Math.floor(rnd(0,5))];h.style.left=e.clientX-12+'px';h.style.top=e.clientY-12+'px';
+  h.style.setProperty('--dx',rnd(-40,40)+'px');h.style.setProperty('--r',rnd(-30,30)+'deg');document.body.append(h);setTimeout(()=>h.remove(),1200)});
+addEventListener('scroll',()=>{$('#bar').style.width=scrollY/(document.documentElement.scrollHeight-innerHeight||1)*100+'%'},{passive:true});
+
+/* floating hearts & balloons layer */
+if(!reduce)for(let i=0;i<14;i++){const s=document.createElement('span');s.textContent=['💗','🎈','💜','✨','🎈','💖'][i%6];
+  s.style.left=rnd(0,95)+'vw';s.style.fontSize=rnd(18,38)+'px';s.style.animationDuration=rnd(12,24)+'s';s.style.animationDelay=-rnd(0,20)+'s';$('#float').append(s)}
+
+/* ================== MUSIC (no autoplay) ================== */
+const audio=new Audio(CONFIG.music);audio.loop=true;let on=false;
+$('#mute').onclick=()=>{on=!on;if(on)audio.play().catch(()=>{on=false;$('#mute').textContent='🔇'});else audio.pause();$('#mute').textContent=on?'🔊':'🔇'};
+
+/* ================== RUNAWAY BUTTON HELPER ================== */
+function dodge(b){ // moves the button anywhere on screen (reparented to <body> so fixed positioning is reliable)
+  if(b.parentNode!==document.body)document.body.append(b);
+  b.style.position='fixed';b.style.zIndex=80;
+  b.style.left=rnd(10,Math.max(20,innerWidth-b.offsetWidth-10))+'px';
+  b.style.top=rnd(70,Math.max(90,innerHeight-b.offsetHeight-80))+'px'}
+function runaway(b,onHit){let i=0;const go=e=>{e.preventDefault();i++;onHit(i);dodge(b)};
+  b.addEventListener('pointerenter',go);b.addEventListener('pointerdown',go);b.addEventListener('click',e=>e.preventDefault())}
+
+/* ================== 1. GATE ================== */
+const noTexts=["No","Are you sure?","Really?","You're breaking my heart 💔","Fine, I'll cry 😭"],no=$('#no');
+runaway(no,i=>{no.textContent=noTexts[Math.min(i,4)];
+  if(i>=4){no.style.transform=`scale(${Math.max(0,1-(i-4)*.35)})`;if(i>=7)no.style.display='none'}});
+$('#yes').onclick=()=>{$('#gate').style.opacity=0;burst(innerWidth/2,innerHeight/2,160);no.remove();
+  setTimeout(()=>{$('#gate').remove();document.body.classList.remove('locked');$('#main').classList.remove('hide');initScratch()},500)};
+
+/* ================== 2. GIFT ================== */
+$('#gift').onclick=function(){if(this.classList.contains('open'))return;this.classList.add('open');
+  burst(...center(this),150);$('#giftHint').hidden=true;$('#giftReveal').hidden=false;
+  setTimeout(()=>$('#giftReveal').scrollIntoView({behavior:'smooth',block:'center'}),400)};
+
+/* ================== 3. WHAT DO YOU THINK ================== */
+$('#amazing').onclick=()=>{$('#react').textContent=CONFIG.amazingReaction;burst(...center($('#react')),120);
+  if($('#dodgy'))$('#dodgy').remove()};
+const dg=$('#dodgy');runaway(dg,i=>{dg.textContent=CONFIG.dodgeTexts[i%CONFIG.dodgeTexts.length];
+  $('#react').textContent=CONFIG.messages[Math.min(i-1,CONFIG.messages.length-1)]});
+
+/* ================== 4. CANDLES ================== */
+let lit=5;const wishEl=$('#wish');
+function out(f){if(f.classList.contains('out'))return;f.classList.add('out');
+  if(--lit===0){wishEl.hidden=false;burst(...center($('.cake')),200);burst(innerWidth/2,innerHeight/3,100)}}
+$('#candles').innerHTML=Array.from({length:5},()=>'<div class="candle"><button class="flame" aria-label="Blow out candle">🔥</button></div>').join('');
+document.querySelectorAll('.flame').forEach(f=>f.onclick=()=>out(f));
+let blowT;const startBlow=()=>{clearInterval(blowT);blowT=setInterval(()=>{const f=document.querySelector('.flame:not(.out)');f?out(f):clearInterval(blowT)},450)};
+const blow=$('#blow');blow.onpointerdown=startBlow;['pointerup','pointerleave','pointercancel'].forEach(ev=>blow.addEventListener(ev,()=>clearInterval(blowT)));
+
+/* ================== 5. BALLOONS ================== */
+$('#balloons').innerHTML=CONFIG.compliments.map((c,i)=>`<button class="bal" data-i="${i}" aria-label="Pop balloon">${['🎈','🎈','🎈'][0]}</button>`).join('');
+document.querySelectorAll('.bal').forEach((b,i)=>{b.style.filter=`hue-rotate(${i*55}deg)`;
+  b.onclick=()=>{burst(...center(b),50,.8);$('#balMsg').textContent=CONFIG.compliments[b.dataset.i];b.style.visibility='hidden'}});
+
+/* ================== 7. SCRATCH CARD ================== */
+function initScratch(){const c=$('#cv'),w=$('#scr').offsetWidth,h=$('#scr').offsetHeight,g=c.getContext('2d');c.width=w;c.height=h;
+  const gr=g.createLinearGradient(0,0,w,h);gr.addColorStop(0,'#ffc83d');gr.addColorStop(.5,'#fff2b0');gr.addColorStop(1,'#ff9f43');
+  g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='#8a5cf6';g.font='800 24px Nunito,sans-serif';g.textAlign='center';g.fillText('✨ Scratch here ✨',w/2,h/2+8);
+  let down=false,n=0,done=false;
+  const pos=e=>{const r=c.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]};
+  const scratch=e=>{if(!down||done)return;const [x,y]=pos(e);g.globalCompositeOperation='destination-out';g.beginPath();g.arc(x,y,22,0,6.28);g.fill();
+    if(++n%8===0){const d=g.getImageData(0,0,w,h).data;let t=0;for(let i=3;i<d.length;i+=64)if(d[i]===0)t++;
+      if(t/(d.length/64)>.5){done=true;c.style.opacity=0;burst(...center($('#scr')),160)}}};
+  c.addEventListener('pointerdown',e=>{down=true;c.setPointerCapture(e.pointerId);scratch(e)});
+  c.addEventListener('pointermove',scratch);['pointerup','pointercancel'].forEach(v=>c.addEventListener(v,()=>down=false))}
+
+/* ================== 8. FINALE ================== */
+let typed=false,fw;
+new IntersectionObserver(([e])=>{
+  if(e.isIntersecting){clearInterval(fw);fw=setInterval(()=>burst(rnd(80,innerWidth-80),rnd(80,innerHeight/2),70),1100);burst(innerWidth/2,innerHeight/3,150);
+    if(!typed){typed=true;let i=0;const t=CONFIG.finalNote,el=$('#note');
+      const step=()=>{el.firstChild?el.firstChild.nodeValue=t.slice(0,++i):el.prepend(t.slice(0,++i));if(i<t.length)setTimeout(step,reduce?1:55)};step()}}
+  else clearInterval(fw)},{threshold:.5}).observe($('#finale'));
+</script>
+</body>
+</html>
